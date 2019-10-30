@@ -105,7 +105,7 @@ for location in locations:
                     except pymysql.err.IntegrityError:
                         print('int error')
                         print(values)
-                        time.sleep(30)
+                        time.sleep(10)
                         break
                     except pymysql.err.OperationalError:
                         time.sleep(30)
