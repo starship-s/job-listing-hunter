@@ -19,9 +19,10 @@ page = '0'
 jobs = []
 now = datetime.datetime.now()
 now = now.strftime("%Y-%m-%d %H:%M")
+today = datetime.date.today()
 
 query = (
-        "INSERT INTO indeed (`key`, `time`, `Company_Name`, `Job_Title`, `Query`, `Location`) VALUES (%s, %s, %s, %s, %s, %s)")
+        "INSERT INTO indeed (`key`, `time`, `Company_Name`, `Job_Title`, `Query`, `Location`, `datekey`) VALUES (%s, %s, %s, %s, %s, %s, %s)")
 
 
 def process_page(location, title, page):
@@ -80,28 +81,32 @@ for location in locations:
 
         for pages in jobs:
             for x in pages:
-                connection = pymysql.connect(user=credentials['user'],
-                                             password=credentials['password'],
-                                             host=credentials['host'],
-                                             database=credentials['database'])
 
                 print(x)
                 while True:
                     try:
+                        connection = pymysql.connect(user=credentials['user'],
+                                                     password=credentials['password'],
+                                                     host=credentials['host'],
+                                                     database=credentials['database'])
                         cursor = connection.cursor()
                         hashing = x[0] + x[1]
                         hashing = hashlib.md5(hashing.encode())
                         hashing = hashing.hexdigest()
+                        datekey = x[0] + x[1] + str(today)
+                        datekey = hashlib.md5(datekey.encode())
+                        datekey = datekey.hexdigest()
                         print(hashing)
-                        values = hashing, now, x[0], x[1], title, location
+                        values = hashing, now, x[0], x[1], title, location, datekey
                         cursor.execute(query, values)
                         cursor.close()
                         connection.commit()
                         connection.close()
                     except pymysql.err.IntegrityError:
-                        time.sleep(30)
                         print('int error')
-                        continue
+                        print(values)
+                        time.sleep(30)
+                        break
                     except pymysql.err.OperationalError:
                         time.sleep(30)
                         print('opp error')

@@ -17,10 +17,11 @@ page = '1'
 jobs = []
 now = datetime.datetime.now()
 now = now.strftime("%Y-%m-%d %H:%M")
+today = datetime.date.today()
 headers = {'User-Agent': 'Mozilla/5.0'}
 
 query = (
-        "INSERT INTO indeed (`key`, `time`, `Company_Name`, `Job_Title`, `Query`, `Location`) VALUES (%s, %s, %s, %s, %s, %s)")
+        "INSERT INTO glassdoor (`key`, `time`, `Company_Name`, `Job_Title`, `Query`, `Location`, `datekey`) VALUES (%s, %s, %s, %s, %s, %s, %s)")
 
 
 def process_page(location, title, page):
@@ -60,8 +61,6 @@ for location in locations:
         while process_page(location.replace(' ', '-'), title.replace(' ', '-'), page) is True:
             page = str(int(page) + 1)
 
-
-
         for pages in jobs:
             for x in pages:
 
@@ -77,16 +76,20 @@ for location in locations:
                         hashing = x[0] + x[1]
                         hashing = hashlib.md5(hashing.encode())
                         hashing = hashing.hexdigest()
+                        datekey = x[0] + x[1] + str(today)
+                        datekey = hashlib.md5(datekey.encode())
+                        datekey = datekey.hexdigest()
                         print(hashing)
-                        values = hashing, now, x[0], x[1], title, location
+                        values = hashing, now, x[0], x[1], title, location, datekey
                         cursor.execute(query, values)
                         cursor.close()
                         connection.commit()
                         connection.close()
                     except pymysql.err.IntegrityError:
-                        time.sleep(30)
                         print('int error')
-                        continue
+                        print(values)
+                        time.sleep(30)
+                        break
                     except pymysql.err.OperationalError:
                         time.sleep(30)
                         print('opp error')
