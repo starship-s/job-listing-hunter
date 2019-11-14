@@ -86,6 +86,7 @@ def glassdoor_get():
     """
     for location in locations:
         for title in titles:
+            global page
             while process_page(location.replace(' ', '-'), title.replace(' ', '-'), page) is True:
                 page = str(int(page) + 1)
 

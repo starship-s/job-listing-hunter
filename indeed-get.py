@@ -89,6 +89,7 @@ def indeed_get():
     """
     for location in locations:
         for title in titles:
+            global page
             while process_page(urllib.parse.quote_plus(location), urllib.parse.quote_plus(title), page) is True:
                 page = str(int(page) + 10)
 
