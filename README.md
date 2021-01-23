@@ -4,4 +4,4 @@ This supports my efforts to determine via analysis what the best job hunting sit
 
 Currently supports Indeed.com and Glassdoor.com
 
-Support for more job listing sites is incoming.
+Support for more job listing sites is possibly incoming.
